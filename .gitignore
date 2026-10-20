@@ -1,0 +1,6 @@
+.DS_Store
+.claude/
+# Original logo source files: the app only uses the shape already built into icons/ and index.html
+icons/29029-logo.svg
+icons/29029-logo-red.svg
+icons/logo_32x32.webp

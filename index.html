@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Ascent Log</title>
+  <meta name="description" content="Live ascent tracker for a 17-ascent, 36-hour mountain ultra.">
+  <meta name="theme-color" content="#0a0a0a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Ascent Log">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap" crossorigin="anonymous">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="strip" id="strip" aria-live="off"></div>
+    <div class="topbar-inner">
+      <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 160.50005 138.9971" aria-hidden="true"><g transform="matrix(0.29307359,0,0,-0.28858849,341.53644,-19.997796)"><path fill="var(--red)" d="m -1165.3607,-550.93986 h 547.64416 l -273.82207,481.644664 z m 506.96059,24.08576 h -43.65715 l -244.21044,313.58874 54.79389,96.38078 z m -212.37298,178.0063 -134.99831,-178.0063 h -56.237 l 102.55226,290.39067 z m -209.29601,-178.0063 h -44.4784 l 118.0064,207.56964 z m 283.25691,0 h -54.70165 l -76.77706,56.3967 72.29743,98.23249 z m 64.89464,0 h -47.90722 l -44.62184,118.53128 z m -209.41694,0 h -32.33215 l 22.46121,29.37505 z m 47.97618,0 h -30.45419 l -9.16354,26.9834 z"/></g></svg>
+        <div>
+          <h1>Ascent Log</h1>
+          <p id="eventLine" class="event-line"></p>
+        </div>
+      </div>
+      <button id="settingsBtn" class="icon-btn" type="button" aria-label="Settings">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <section id="setup" class="card setup" hidden>
+      <h2>Set your event start</h2>
+      <p class="muted">Goal schedules and the 36-hour cutoff are measured from this time.</p>
+      <div class="field-row">
+        <label class="field"><span>Date</span><input type="date" id="setupDate"></label>
+        <label class="field"><span>Start time</span><input type="time" id="setupTime" value="06:00"></label>
+      </div>
+      <button id="setupSave" class="btn btn-primary" type="button">Save event start</button>
+    </section>
+
+    <section id="status" class="card hero" aria-live="off"></section>
+
+    <section class="card" aria-labelledby="goalHead">
+      <h2 id="goalHead">Goal scenario</h2>
+      <div id="goalPicker" class="seg" role="group" aria-label="Goal scenario"></div>
+      <p id="goalSummary" class="goal-summary"></p>
+      <div id="goalStatus"></div>
+    </section>
+
+    <section class="card" aria-labelledby="projHead">
+      <h2 id="projHead">Projections</h2>
+      <div id="projection"></div>
+    </section>
+
+    <section class="card flush" aria-labelledby="totalsHead">
+      <h2 id="totalsHead">Totals</h2>
+      <div id="totals" class="stats"></div>
+    </section>
+
+    <section class="card flush" aria-labelledby="lapsHead">
+      <h2 id="lapsHead">Ascents</h2>
+      <div class="table-wrap"><table id="lapTable" class="laps"></table></div>
+      <p class="table-note">Tap an ascent to enter or edit its times. <b>Break</b> is the time from finishing an ascent to starting the next. <b>±</b> is how far ahead (+) or behind (−) the goal start you began each ascent (minutes, or h:mm).</p>
+    </section>
+
+    <section class="card" aria-labelledby="chartHead">
+      <h2 id="chartHead">Elapsed time vs. goals</h2>
+      <p class="muted small">Hours since the start when each ascent is done. Below a goal line = ahead of it.</p>
+      <div id="chartLegend" class="legend"></div>
+      <div id="chartBox" class="chart-box"></div>
+    </section>
+
+    <section class="card" aria-labelledby="summitsHead">
+      <h2 id="summitsHead">Seven Summits</h2>
+      <p id="summitsSub" class="summits-sub"></p>
+      <ol id="summitList" class="summit-list"></ol>
+      <p id="summitsNote" class="muted small summits-note"></p>
+    </section>
+  </main>
+
+  <nav class="actionbar" aria-label="Ascent controls">
+    <div class="actionbar-inner">
+      <button id="manualBtn" class="btn-manual" type="button">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m13.5 6.5 4 4" stroke="currentColor" stroke-width="2"/></svg>
+        <span>Enter time</span>
+      </button>
+      <button id="mainBtn" class="btn-main" type="button"></button>
+    </div>
+  </nav>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden>
+    <span id="toastMsg"></span>
+    <button id="toastAction" type="button" hidden></button>
+  </div>
+
+  <!-- Edit ascent -->
+  <dialog id="editDialog" aria-labelledby="editTitle">
+    <form id="editForm" class="sheet" novalidate>
+      <header class="sheet-head">
+        <h2 id="editTitle" tabindex="-1" autofocus>Ascent</h2>
+        <button type="button" class="icon-btn" data-close aria-label="Close">✕</button>
+      </header>
+      <p id="editGoal" class="muted small"></p>
+      <div class="time-field" data-field="start">
+        <label for="editStart">Start</label>
+        <input type="datetime-local" id="editStart">
+        <p class="read" id="editStartRead"></p>
+        <div class="chips">
+          <button type="button" class="chip" data-adj="-5">−5m</button>
+          <button type="button" class="chip" data-adj="-1">−1m</button>
+          <button type="button" class="chip" data-adj="1">+1m</button>
+          <button type="button" class="chip" data-adj="5">+5m</button>
+          <button type="button" class="chip" data-now>Now</button>
+          <button type="button" class="chip chip-quiet" data-clear>Clear</button>
+        </div>
+      </div>
+      <div class="time-field" data-field="end">
+        <label for="editEnd">End</label>
+        <input type="datetime-local" id="editEnd">
+        <p class="read" id="editEndRead"></p>
+        <div class="chips">
+          <button type="button" class="chip" data-adj="-5">−5m</button>
+          <button type="button" class="chip" data-adj="-1">−1m</button>
+          <button type="button" class="chip" data-adj="1">+1m</button>
+          <button type="button" class="chip" data-adj="5">+5m</button>
+          <button type="button" class="chip" data-now>Now</button>
+          <button type="button" class="chip chip-quiet" data-clear>Clear</button>
+        </div>
+      </div>
+      <p id="editDuration" class="edit-duration"></p>
+      <p id="editError" class="form-error" role="alert"></p>
+      <footer class="sheet-foot">
+        <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- Settings -->
+  <dialog id="settingsDialog" aria-labelledby="settingsTitle">
+    <div class="sheet">
+      <header class="sheet-head">
+        <h2 id="settingsTitle" tabindex="-1" autofocus>Settings</h2>
+        <button type="button" class="icon-btn" data-close aria-label="Close">✕</button>
+      </header>
+
+      <h3>Event</h3>
+      <div class="field-row">
+        <label class="field"><span>Date</span><input type="date" id="setDate"></label>
+        <label class="field"><span>Start time</span><input type="time" id="setTime"></label>
+      </div>
+      <div class="field-row">
+        <label class="field"><span>Time limit (hours)</span><input type="number" id="setCutoff" min="1" max="240" step="0.5" inputmode="decimal"></label>
+        <label class="field"><span>Ascents</span><input type="number" id="setLaps" min="1" max="99" step="1" inputmode="numeric"></label>
+      </div>
+      <div class="field-row">
+        <label class="field"><span>Miles per ascent</span><input type="number" id="setMiles" min="0" step="0.01" inputmode="decimal"></label>
+        <label class="field"><span>Feet climbed per ascent</span><input type="number" id="setFeet" min="0" step="1" inputmode="numeric"></label>
+      </div>
+      <label class="field"><span>Appearance</span>
+        <select id="setTheme">
+          <option value="dark">Dark</option>
+          <option value="light">Light (bright sun)</option>
+          <option value="auto">Match device</option>
+        </select>
+      </label>
+      <p id="settingsError" class="form-error" role="alert"></p>
+
+      <h3>Goal scenarios</h3>
+      <ul id="scenarioList" class="scenario-list"></ul>
+      <div class="btn-row">
+        <button type="button" id="addScenario" class="btn btn-secondary">Add scenario</button>
+        <button type="button" id="restoreScenarios" class="btn btn-ghost">Restore defaults</button>
+      </div>
+
+      <h3>Data</h3>
+      <p class="muted small">Everything is stored on this device only. Export a backup before the event and now and then during it.</p>
+      <div class="btn-row">
+        <button type="button" id="exportJson" class="btn btn-secondary">Export backup</button>
+        <button type="button" id="importJson" class="btn btn-secondary">Import backup</button>
+        <button type="button" id="exportCsv" class="btn btn-secondary">Export CSV</button>
+      </div>
+      <input type="file" id="importFile" accept="application/json,.json" hidden>
+      <div class="btn-row">
+        <button type="button" id="resetLaps" class="btn btn-danger">Clear all ascent times</button>
+      </div>
+
+      <footer class="sheet-foot">
+        <button type="button" class="btn btn-primary" data-close>Done</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <!-- Scenario editor -->
+  <dialog id="scenarioDialog" aria-labelledby="scenarioTitle">
+    <form id="scenarioForm" class="sheet" novalidate>
+      <header class="sheet-head">
+        <h2 id="scenarioTitle" tabindex="-1" autofocus>Scenario</h2>
+        <button type="button" class="icon-btn" data-close aria-label="Close">✕</button>
+      </header>
+      <label class="field"><span>Name</span><input type="text" id="scName" maxlength="40" required></label>
+      <div class="field-row">
+        <label class="field"><span>Minutes from one ascent start to the next</span><input type="number" id="scBase" min="1" step="1" inputmode="numeric"></label>
+      </div>
+      <div class="field-row">
+        <label class="field"><span>Then add (min)</span><input type="number" id="scStep" min="0" step="1" inputmode="numeric"></label>
+        <label class="field"><span>Every … ascents</span><input type="number" id="scEvery" min="1" step="1" inputmode="numeric"></label>
+      </div>
+      <div class="field-row">
+        <label class="field"><span>Meal/rest extra (min)</span><input type="number" id="scExtra" min="0" step="1" inputmode="numeric"></label>
+        <label class="field"><span>On ascents (comma separated)</span><input type="text" id="scExtraLaps" inputmode="numeric" placeholder="4, 6, 12, 15"></label>
+      </div>
+      <p id="scPreviewHead" class="preview-head"></p>
+      <div class="preview-wrap"><table id="scPreview" class="preview"></table></div>
+      <p id="scError" class="form-error" role="alert"></p>
+      <footer class="sheet-foot">
+        <button type="button" id="scDelete" class="btn btn-danger-ghost">Delete</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </footer>
+    </form>
+  </dialog>
+
+  <!-- Ascent mantra -->
+  <dialog id="mantraDialog" class="mantra-pop" aria-labelledby="mantraText" aria-describedby="mantraEyebrow">
+    <div class="mantra-inner">
+      <p id="mantraEyebrow" class="mantra-eyebrow"></p>
+      <div class="mantra-mark" aria-hidden="true">“</div>
+      <h2 id="mantraText" tabindex="-1" autofocus></h2>
+      <button type="button" class="btn btn-primary mantra-btn" data-close>Let's go</button>
+    </div>
+  </dialog>
+
+  <!-- Summit celebration -->
+  <dialog id="summitDialog" class="summit-pop" aria-labelledby="summitMsg" aria-describedby="summitMeta">
+    <div class="summit-inner">
+      <div id="confetti" class="confetti" aria-hidden="true"></div>
+      <svg class="summit-icon" viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M32 6v15" stroke="currentColor" stroke-width="3"/>
+        <path d="M33.5 7H50l-4 5 4 5H33.5z" fill="var(--red)"/>
+        <path d="M4 58 26 22l6 9 6-8 22 35z" fill="currentColor"/>
+        <path d="m26 22 6 9 6-8 5 8-6-2-5 5-5-6-6 4z" fill="var(--surface)" opacity=".85"/>
+      </svg>
+      <p id="summitEyebrow" class="summit-eyebrow"></p>
+      <h2 id="summitMsg" tabindex="-1" autofocus></h2>
+      <p id="summitMeta" class="summit-meta"></p>
+      <button type="button" id="summitBtn" class="btn btn-primary summit-btn" data-close>Keep climbing</button>
+    </div>
+  </dialog>
+
+  <!-- Confirmation -->
+  <dialog id="confirmDialog" class="confirm" aria-labelledby="confirmTitle" aria-describedby="confirmMsg">
+    <div class="sheet">
+      <header class="sheet-head">
+        <h2 id="confirmTitle" tabindex="-1" autofocus>Are you sure?</h2>
+      </header>
+      <p id="confirmMsg" class="confirm-msg"></p>
+      <footer class="sheet-foot">
+        <button type="button" class="btn btn-ghost" data-answer="no">Cancel</button>
+        <button type="button" class="btn btn-primary" data-answer="yes" id="confirmYes">Confirm</button>
+      </footer>
+    </div>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
